@@ -404,7 +404,18 @@ export default function App() {
     setExporting(true);
     showAlert("جاري إعداد صورة PNG بجودة عالية... يرجى الانتظار", "info");
 
+    // حفظ أبعاد التنسيق الأصلية للجهاز اللوحي أو الهاتف
+    const originalWidth = printAreaRef.current.style.width;
+    const originalMaxWidth = printAreaRef.current.style.maxWidth;
+
     try {
+      // فرض عرض مكتبي ثابت بشكل مؤقت أثناء التوليد لتفادي قص أي عمود
+      printAreaRef.current.style.width = "1024px";
+      printAreaRef.current.style.maxWidth = "none";
+      
+      // ننتظر برهة صغيرة لكي يعيد المتصفح رسم الصفحة بالأبعاد الجديدة
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       // إخفاء التأثيرات وحفظ اتساق الألوان للغة العربية بدون تقطيع عبر html-to-image
       const dataUrl = await toPng(printAreaRef.current, {
         quality: 0.98,
@@ -425,6 +436,11 @@ export default function App() {
       console.error("فشل التصدير كصورة:", err);
       showAlert("حدث خطأ أثناء تصدير الصورة.", "warning");
     } finally {
+      // إعادة الأبعاد الأصلية للتجاوب فوراً
+      if (printAreaRef.current) {
+        printAreaRef.current.style.width = originalWidth;
+        printAreaRef.current.style.maxWidth = originalMaxWidth;
+      }
       setExporting(false);
     }
   };
@@ -434,7 +450,18 @@ export default function App() {
     setExporting(true);
     showAlert("جاري إنشاء ملف PDF التفاعلي... يرجى الانتظار", "info");
 
+    // حفظ أبعاد التنسيق الأصلية للجهاز اللوحي أو الهاتف
+    const originalWidth = printAreaRef.current.style.width;
+    const originalMaxWidth = printAreaRef.current.style.maxWidth;
+
     try {
+      // فرض عرض مكتبي ثابت بشكل مؤقت أثناء التوليد لتفادي قص أي عمود
+      printAreaRef.current.style.width = "1024px";
+      printAreaRef.current.style.maxWidth = "none";
+      
+      // ننتظر برهة صغيرة لكي يعيد المتصفح رسم الصفحة بالأبعاد الجديدة
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       const dataUrl = await toPng(printAreaRef.current, {
         quality: 0.98,
         pixelRatio: 2, // دقة عالية
@@ -483,6 +510,11 @@ export default function App() {
       console.error("فشل التصدير كـ PDF:", err);
       showAlert("حدث خطأ أثناء تصدير ملف PDF.", "warning");
     } finally {
+      // إعادة الأبعاد الأصلية للتجاوب فوراً
+      if (printAreaRef.current) {
+        printAreaRef.current.style.width = originalWidth;
+        printAreaRef.current.style.maxWidth = originalMaxWidth;
+      }
       setExporting(false);
     }
   };
